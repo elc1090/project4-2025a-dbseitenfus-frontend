@@ -1,0 +1,46 @@
+/* Basic editor styles */
+.tiptap :first-child {
+  margin-top: 0;
+}
+
+/* Placeholder (at the top) */
+.tiptap p.is-editor-empty:first-child::before {
+  color: var(--gray-4, #a0aec0);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.tiptap p {
+  word-break: break-word;
+}
+
+/* Cursor colaborativo - a barra vertical colorida */
+.collaboration-cursor__caret {
+  border-left: 2px solid;
+  border-color: var(--cursor-color);
+  margin-left: -1px;
+  margin-right: -1px;
+  pointer-events: none;
+  position: relative;
+  word-break: normal;
+  border-radius: 1px;
+}
+
+/* Label com nome do usuário */
+.collaboration-cursor__label {
+  border-radius: 3px 3px 3px 0;
+  color: #000000;
+  font-size: 12px;
+  font-weight: 600;
+  left: -1px;
+  line-height: normal;
+  padding: 0.1rem 0.3rem;
+  position: absolute;
+  top: -1.4em;
+  user-select: none;
+  white-space: nowrap;
+  background-color: var(--cursor-color);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
+}
