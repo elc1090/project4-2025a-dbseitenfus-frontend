@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { GalleryVerticalEnd } from "lucide-react"
-
+import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,25 +20,31 @@ export function LoginForm({ className, ...props }) {
   async function handleSubmit(e) {
     e.preventDefault()
     try {
+      
       setLoading(true)
       const response = await login(username, password)
+
       if(!response.ok) {
-        alert("Login falhou: " + (response || "Verifique usuário e senha."))
+        toast.error("Login falhou. Verifique usuário e senha.")
         setLoading(false)
         return
       }
+
       const data = await response.json()
+
       if (data.token) {
         localStorage.setItem("token", data.token)
         router.push("/") 
         setLoading(false)
-      } else {
-        setLoading(false)
-        alert("Login falhou: " + (data || "Verifique usuário e senha."))
-      }
+        return
+      } 
+      
+      setLoading(false)
+      toast.error("Login falhou. Verifique usuário e senha.")
+
     } catch (error) {
       setLoading(false)
-      alert("Erro ao tentar logar: " + error.message)
+      toast.error("Erro ao tentar logar: " + error.message)
     }
   }
 
