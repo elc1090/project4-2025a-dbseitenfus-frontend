@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createUser, login } from "@/lib/api"
+import { CircularProgress } from "./ui/circular-progress"
 
 export function SignupForm({ className, ...props }) {
   const [username, setUsername] = useState("")
@@ -16,33 +17,37 @@ export function SignupForm({ className, ...props }) {
   const [first_name, setFirst_name] = useState("")
   const [last_name, setLast_name] = useState("")
   const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   async function handleSubmit(e) {
     e.preventDefault()
     try {
+      setLoading(true)
       const response = await createUser({ username, email, first_name, last_name, password })
-      console.log("Response:", response)
       if (response.ok) {
         const loginResponse = await login(username, password)
-        console.log("Login Response:", loginResponse)
         if (loginResponse.ok) {
           const data = await loginResponse.json()
-          console.log("Login Data:", data)
           if (data.token) {
             localStorage.setItem("token", data.token)
             router.push("/")
+            setLoading(false)
           } else {
             alert("Login falhou: " + (response || "Verifique usuário e senha."))
+            setLoading(false)
           }
         } else {
           alert("Login falhou: " + (response || "Verifique usuário e senha."))
+          setLoading(false)
         }
       } else {
         alert("Cadastro falhou: " + (response || "Verifique usuário e senha."))
+        setLoading(false)
       }
     } catch (error) {
       alert("Erro ao tentar logar: " + error.message)
+      setLoading(false)
     }
   }
 
@@ -118,7 +123,7 @@ export function SignupForm({ className, ...props }) {
               />
             </div>
             <Button type="submit" className="w-full">
-              Cadastrar
+              { loading ? <CircularProgress /> : "Cadastrar"}
             </Button>
           </div>
         </div>
