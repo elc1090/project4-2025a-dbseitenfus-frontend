@@ -9,28 +9,35 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { login } from "@/lib/api" 
+import { CircularProgress } from "./ui/circular-progress"
 
 export function LoginForm({ className, ...props }) {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   async function handleSubmit(e) {
     e.preventDefault()
     try {
+      setLoading(true)
       const response = await login(username, password)
       if(!response.ok) {
         alert("Login falhou: " + (response || "Verifique usuário e senha."))
+        setLoading(false)
         return
       }
       const data = await response.json()
       if (data.token) {
         localStorage.setItem("token", data.token)
         router.push("/") 
+        setLoading(false)
       } else {
+        setLoading(false)
         alert("Login falhou: " + (data || "Verifique usuário e senha."))
       }
     } catch (error) {
+      setLoading(false)
       alert("Erro ao tentar logar: " + error.message)
     }
   }
@@ -76,7 +83,9 @@ export function LoginForm({ className, ...props }) {
               />
             </div>
             <Button type="submit" className="w-full">
-              Entrar
+              { loading ?
+                <CircularProgress />
+                : "Entrar"}              
             </Button>
           </div>
           
