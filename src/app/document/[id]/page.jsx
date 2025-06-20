@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { FileText } from 'lucide-react'
-import { getDocument, saveDocument } from '@/lib/api'
+import { FileText, Play, Pause } from 'lucide-react'
+import { getDocument, saveDocument, tts } from '@/lib/api'
+import { CircularProgress } from '@/components/ui/circular-progress'
 
 import {
   Bold,
@@ -46,6 +47,7 @@ import './collaboration-cursor.css'
 import { Input } from '@/components/ui/input'
 
 import { WebsocketProvider } from 'y-websocket'
+import { toast } from 'sonner'
 
 
 export default function DocumentPage() {
@@ -56,6 +58,8 @@ export default function DocumentPage() {
 
   const [document, setDocument] = useState(null)
   const [editor, setEditor] = useState(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const ydocRef = useRef(null)
   const providerRef = useRef(null)
@@ -70,8 +74,6 @@ export default function DocumentPage() {
   ]
 
   useEffect(() => {
-
-
     let isCancelled = false
 
     async function init() {
@@ -80,13 +82,7 @@ export default function DocumentPage() {
       const provider = new WebsocketProvider(
         'wss://demos.yjs.dev/ws', `room-document-${documentId}`, ydoc
       )
-      // const provider = new WebrtcProvider(`room-${documentId}`, ydoc, {
-      //   signaling: [
-      //     'wss://demos.yjs.dev',        ],
-      //   // opcional: para forçar reconexões automáticas
-      //   maxConns: 20,
-      //   filterBcConns: true,
-      // })
+
       ydocRef.current = ydoc
       providerRef.current = provider
 
@@ -190,6 +186,27 @@ export default function DocumentPage() {
     }
   }
 
+  async function playTTS(text) {
+    setIsLoading(true)
+    const res = await tts(text);
+    if (!res.ok) {
+      toast.error('Erro ao gerar áudio. Tente novamente mais tarde.');
+      setIsPlaying(false)
+      setIsLoading(false)
+      return;
+    }
+
+    const blob = await res.blob();
+    const audioUrl = URL.createObjectURL(blob);
+    const audio = new Audio(audioUrl);
+
+    audio.play();
+    setIsLoading(false)
+    setIsPlaying(true)
+    audio.onended = () => setIsPlaying(false)
+    audio.onpause = () => setIsPlaying(false)
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-neutral-100">
       <div className="w-full h-[100px] flex items-center px-4 bg-white">
@@ -253,7 +270,18 @@ export default function DocumentPage() {
             </MenubarMenu>
           </Menubar>
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            className="bg-gradient-to-r from-blue-700 to-violet-800 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+            onClick={(e) => {
+                playTTS(editor?.getText())
+              }
+            }
+          >
+            { isLoading ? <CircularProgress /> :
+            isPlaying ? <Pause size={16} /> : <Play size={16} />}
+            Escutar
+          </button>
           <Button onClick={handleSave}>Salvar arquivo</Button>
         </div>
       </div>
