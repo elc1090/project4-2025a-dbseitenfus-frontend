@@ -151,7 +151,7 @@ export default function DocumentPage() {
         editorRef.current = newEditor
         setEditor(newEditor)
       } catch (error) {
-        console.error('Erro ao inicializar o documento:', error)
+        toast.error('Erro ao inicializar o documento:', error)
       }
     }
 
@@ -176,13 +176,10 @@ export default function DocumentPage() {
       const update = Y.encodeStateAsUpdate(ydocRef.current)
       const base64Update = btoa(String.fromCharCode(...update))
       const plain_text = editor.getText()
-      console.log(plain_text)
-
       await saveDocument(documentId, document.title, base64Update, plain_text)
-      alert('Documento salvo!')
+      toast.success("Documento salvo!")
     } catch (error) {
-      console.error('Erro ao salvar documento:', error)
-      alert('Erro ao salvar documento.')
+      toast.error('Erro ao salvar documento:', error)
     }
   }
 
