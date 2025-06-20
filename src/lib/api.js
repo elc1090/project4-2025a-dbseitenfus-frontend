@@ -1,5 +1,6 @@
 
-const URL_BASE = "https://project3-2025a-dbseitenfus-backend.onrender.com/api";
+const URL_BASE = "http://localhost:8000/api";
+// const URL_BASE = "https://project3-2025a-dbseitenfus-backend.onrender.com/api";
 
 function getApiToken() {
     return `Token ${localStorage.getItem("token")}`;
@@ -152,6 +153,23 @@ export async function deleteDocument(documentId) {
 
     if (!res.ok) {
         console.log(`Error deleting document with ID ${documentId}: ${res.statusText}`);
+    }
+
+    return res;
+}
+
+export async function tts(text) {
+    const res = await fetch(`${URL_BASE}/tts/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': getApiToken()
+        },
+        body: JSON.stringify({ text }),
+    });
+
+    if (!res.ok) {
+        throw new Error(`TTS request failed: ${res.statusText}`);
     }
 
     return res;
