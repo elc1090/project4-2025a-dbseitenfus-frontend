@@ -10,47 +10,43 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { login } from "@/lib/api" 
 import { CircularProgress } from "./ui/circular-progress"
+import { useSession, signIn } from "next-auth/react"
 
 export function LoginForm({ className, ...props }) {
-  const [username, setUsername] = useState("")
+
+  const { data: session } = useSession()
+  
+  useEffect(() => {
+    if (session) {
+      router.push("/") 
+    }
+  }, [session])
+
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-    try {
-      
-      setLoading(true)
-      const response = await login(username, password)
+ const handleLogin = async (e) => {
+  e.preventDefault(); // Impede o reload
+  setLoading(true)
+  const res = await signIn("credentials", {
+    email,
+    password,
+    redirect: false, // Impede redirecionamento automático
+  })
 
-      if(!response.ok) {
-        toast.error("Login falhou. Verifique usuário e senha.")
-        setLoading(false)
-        return
-      }
-
-      const data = await response.json()
-
-      if (data.token) {
-        localStorage.setItem("token", data.token)
-        router.push("/") 
-        setLoading(false)
-        return
-      } 
-      
-      setLoading(false)
-      toast.error("Login falhou. Verifique usuário e senha.")
-
-    } catch (error) {
-      setLoading(false)
-      toast.error("Erro ao tentar logar: " + error.message)
-    }
+  if (res.ok) {
+    router.push("/") 
+  } else {
+    setLoading(false)
+    toast.error("Erro no login")
   }
+}
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleLogin}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
             <a href="#" className="flex flex-col items-center gap-2 font-medium">
@@ -69,14 +65,14 @@ export function LoginForm({ className, ...props }) {
           </div>
           <div className="flex flex-col gap-6">
             <div className="grid gap-3">
-              <Label htmlFor="text">Usuário</Label>
+              <Label htmlFor="text">E-mail</Label>
               <Input
-                id="username"
-                type="text"
-                placeholder="usuário"
+                id="email"
+                type="email"
+                placeholder="e-mail"
                 required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <Label htmlFor="password">Senha</Label>
               <Input
@@ -88,7 +84,7 @@ export function LoginForm({ className, ...props }) {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={loading}>
               { loading ?
                 <CircularProgress />
                 : "Entrar"}              
@@ -109,7 +105,7 @@ export function LoginForm({ className, ...props }) {
               </svg>
               Continue with Apple
             </Button>
-            <Button variant="outline" type="button" className="w-full" onClick={() => signIn("google")}>
+            <Button variant="outline" type="button" className="w-full" onClick={() => signIn("google", { prompt: "select_account" })}>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path
                   d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
