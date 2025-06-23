@@ -58,6 +58,10 @@ export default function Home() {
     setDocuments((prevDocuments) => [...prevDocuments, documentResponse])
   }
 
+  function removeDocument(documentId) {
+    setDocuments((prevDocuments) => prevDocuments.filter(doc => doc.id !== documentId))
+  }
+
   if (isAuthenticating) {
     return (<div className="flex items-center justify-center h-screen">
       <CircularProgress />
@@ -78,7 +82,7 @@ export default function Home() {
               ) : (
                 <div className="grid grid-cols-4 gap-4 p-3">
                   {documents.map((document) => (
-                    <DocumentCard key={document.id} document={document} />
+                    <DocumentCard key={document.id} document={document} removeDocument={removeDocument}/>
                   ))}
                 </div>)}
             </SidebarInset>

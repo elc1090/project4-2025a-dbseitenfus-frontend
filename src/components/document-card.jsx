@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { toast } from "sonner"
 
-export default function DocumentCard({ document }) {
+export default function DocumentCard({ document, removeDocument }) {
     const router = useRouter()
     const { data: session } = useSession()
 
@@ -36,9 +36,9 @@ export default function DocumentCard({ document }) {
 
         try {
             const res = await deleteDocument(document.id, session.accessToken)
-            if (res.status === 204) {
+            if (res.ok) {
                 toast.success("Documento excluído com sucesso!")
-                router.refresh() 
+                removeDocument(document.id)
             } else {
                 toast.error("Erro ao excluir o documento.")
             }
@@ -46,7 +46,6 @@ export default function DocumentCard({ document }) {
             toast.error(error.message)
         }
     }
-
 
     return (
         <Card className="bg-stone-50" onClick={() => router.push(`/document/${document.id}`)}>
