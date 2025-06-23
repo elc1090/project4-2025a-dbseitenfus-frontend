@@ -10,9 +10,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createUser, login } from "@/lib/api"
 import { CircularProgress } from "./ui/circular-progress"
+import { signIn } from "next-auth/react"
 
 export function SignupForm({ className, ...props }) {
-  const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [first_name, setFirst_name] = useState("")
   const [last_name, setLast_name] = useState("")
@@ -24,22 +24,18 @@ export function SignupForm({ className, ...props }) {
     e.preventDefault()
     try {
       setLoading(true)
-      const response = await createUser({ username, email, first_name, last_name, password })
+      const response = await createUser({ username: email, email, first_name, last_name, password })
       if (response.ok) {
-        const loginResponse = await login(username, password)
-        if (loginResponse.ok) {
-          const data = await loginResponse.json()
-          if (data.token) {
-            localStorage.setItem("token", data.token)
-            router.push("/")
-            setLoading(false)
-          } else {
-            alert("Login falhou: " + (response || "Verifique usuário e senha."))
-            setLoading(false)
-          }
+        const res = await signIn("credentials", {
+          email, // <-- pode mudar para "username" se necessário
+          password,
+          redirect: false,
+        })
+
+        if (res.ok) {
+          router.push("/")
         } else {
-          alert("Login falhou: " + (response || "Verifique usuário e senha."))
-          setLoading(false)
+          alert("Login falhou após cadastro.")
         }
       } else {
         alert("Cadastro falhou: " + (response || "Verifique usuário e senha."))
@@ -72,16 +68,6 @@ export function SignupForm({ className, ...props }) {
           </div>
           <div className="flex flex-col gap-6">
             <div className="grid gap-3">
-              <Label htmlFor="text">Usuário</Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="O usuário deve ser único e não pode conter espaços"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-
               <Label htmlFor="text">E-mail</Label>
               <Input
                 id="email"
