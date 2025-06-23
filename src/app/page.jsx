@@ -16,7 +16,7 @@ export default function Home() {
 
   useEffect(() => {
     if (status === "loading") {
-      return; 
+      return;
     }
     if (!session) {
       router.push('/login');
@@ -58,9 +58,12 @@ export default function Home() {
     setDocuments((prevDocuments) => [...prevDocuments, documentResponse])
   }
 
-  if (!isAuthenticating) {
+  if (isAuthenticating) {
+    return (<div className="flex items-center justify-center h-screen">
+      <CircularProgress />
+    </div>)
+  } else {
     return (
-
       <div className="[--header-height:calc(theme(spacing.14))]">
         <SidebarProvider className="flex flex-col">
           <SiteHeader />
@@ -83,9 +86,5 @@ export default function Home() {
         </SidebarProvider>
       </div>
     )
-  } else {
-    <div className="flex items-center justify-center h-screen">
-      <CircularProgress />
-    </div>
   }
 }
