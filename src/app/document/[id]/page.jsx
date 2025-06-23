@@ -48,10 +48,12 @@ import { Input } from '@/components/ui/input'
 
 import { WebsocketProvider } from 'y-websocket'
 import { toast } from 'sonner'
+import { useSession } from 'next-auth/react'
 
 
 export default function DocumentPage() {
   const router = useRouter()
+  const { data: session } = useSession()
 
   const params = useParams()
   const documentId = params.id
@@ -86,22 +88,22 @@ export default function DocumentPage() {
       ydocRef.current = ydoc
       providerRef.current = provider
 
-      // 👇 Recupera usuário do localStorage
+      // 👇 Recupera usuário da session
       const savedUser = (() => {
         try {
-          const userStr = localStorage.getItem('user')
+          const userStr = session.user.name
           if (userStr) {
             return JSON.parse(userStr)
           }
         } catch (e) {
-          console.warn('Erro ao ler user do localStorage:', e)
+          console.warn('Erro ao ler user da session:', e)
         }
         return { username: 'Usuário' }
       })()
 
 
       try {
-        const response = await getDocument(documentId)
+        const response = await getDocument(documentId, session.accessToken)
         if (isCancelled) return
 
         setDocument(response)
@@ -135,7 +137,7 @@ export default function DocumentPage() {
             CollaborationCursor.configure({
               provider,
               user: {
-                name: savedUser.username || 'Usuário',
+                name: savedUser.name || 'Usuário',
                 color: COLORS[Math.floor(Math.random() * COLORS.length)],
               },
 
@@ -176,7 +178,7 @@ export default function DocumentPage() {
       const update = Y.encodeStateAsUpdate(ydocRef.current)
       const base64Update = btoa(String.fromCharCode(...update))
       const plain_text = editor.getText()
-      await saveDocument(documentId, document.title, base64Update, plain_text)
+      await saveDocument(documentId, document.title, base64Update, plain_text, session.accessToken)
       toast.success("Documento salvo!")
     } catch (error) {
       toast.error('Erro ao salvar documento:', error)
@@ -185,7 +187,7 @@ export default function DocumentPage() {
 
   async function playTTS(text) {
     setIsLoading(true)
-    const res = await tts(text);
+    const res = await tts(text, session.accessToken);
     if (!res.ok) {
       toast.error('Erro ao gerar áudio. Tente novamente mais tarde.');
       setIsPlaying(false)
