@@ -10,6 +10,7 @@ import {
 } from "lucide-react"
 
 import { useRouter } from "next/navigation"
+import { signOut } from "next-auth/react"
 
 import {
   Avatar,
@@ -51,7 +52,7 @@ export function NavUser({
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.first_name}</span>
+                <span className="truncate font-medium">{user.name}</span>
                 <span className="truncate text-xs">{user.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
@@ -69,7 +70,7 @@ export function NavUser({
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.username}</span>
+                  <span className="truncate font-medium">{user.name}</span>
                   <span className="truncate text-xs">{user.email}</span>
                 </div>
               </div>
@@ -98,9 +99,7 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => {
-              localStorage.removeItem("token")
-              localStorage.removeItem("user")
-              router.push("/login")
+              signOut({ callbackUrl: `http://localhost:3000/login` })
             }}>
               <LogOut />
               Log out
