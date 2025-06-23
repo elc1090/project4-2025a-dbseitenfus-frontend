@@ -13,6 +13,7 @@ import {
 import { FileText, Link, MoreVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { deleteDocument } from "@/lib/api"
+import { useSession } from "next-auth/react"
 
 //Dropdown Menu
 import {
@@ -24,15 +25,16 @@ import {
 
 export default function DocumentCard({ document }) {
     const router = useRouter()
+    const { data: session } = useSession()
 
     async function handleDelete(e) {
-        e.stopPropagation()  // evita que o clique propague para o card (evitando redirecionamento)
+        e.stopPropagation()  
 
         const confirmDelete = window.confirm("Tem certeza que deseja excluir este documento?")
         if (!confirmDelete) return
 
         try {
-            const res = await deleteDocument(document.id)
+            const res = await deleteDocument(document.id, session.accessToken)
             if (res.status === 204) {
                 alert("Documento excluído com sucesso!")
                 router.refresh() 
