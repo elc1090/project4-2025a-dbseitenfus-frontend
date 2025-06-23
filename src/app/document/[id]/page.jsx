@@ -10,11 +10,8 @@ import {
   Bold,
   Italic,
   Underline,
-  List,
-  ListOrdered,
   Redo2,
   Undo2,
-  Quote,
   X,
 } from 'lucide-react'
 
@@ -317,66 +314,6 @@ export default function DocumentPage() {
                   title="Sublinhado"
                 >
                   <Underline className="w-4 h-4" />
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-                  className={editor.isActive('heading', { level: 1 }) ? 'bg-gray-200' : ''}
-                  title="Título H1"
-                >
-                  H1
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                  className={editor.isActive('heading', { level: 2 }) ? 'bg-gray-200' : ''}
-                  title="Título H2"
-                >
-                  H2
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-                  className={editor.isActive('heading', { level: 3 }) ? 'bg-gray-200' : ''}
-                  title="Título H3"
-                >
-                  H3
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => editor.chain().focus().toggleBulletList().run()}
-                  className={editor.isActive('bulletList') ? 'bg-gray-200' : ''}
-                  title="Lista não ordenada"
-                >
-                  <List className="w-4 h-4" />
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                  className={editor.isActive('orderedList') ? 'bg-gray-200' : ''}
-                  title="Lista ordenada"
-                >
-                  <ListOrdered className="w-4 h-4" />
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                  className={editor.isActive('blockquote') ? 'bg-gray-200' : ''}
-                  title="Citação"
-                >
-                  <Quote className="w-4 h-4" />
                 </Button>
 
                 <Button
