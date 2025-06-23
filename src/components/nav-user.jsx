@@ -39,6 +39,15 @@ export function NavUser({
   const { isMobile } = useSidebar()
   const router = useRouter()
 
+  function getInitials(name) {
+    if (!name) return "CN";
+    const parts = name.split(" ");
+    if (parts.length === 0) return "CN";
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return parts[0].charAt(0).toUpperCase() +
+           parts[parts.length - 1].charAt(0).toUpperCase();
+  }
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -48,8 +57,8 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src="/avatars/shadcn.jpg" alt={user.username} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarImage src={user.image} alt={user.username} />
+                <AvatarFallback className="rounded-lg">{getInitials(user.name)}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
@@ -63,40 +72,6 @@ export function NavUser({
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}>
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src="/avatars/shadcn.jpg" alt={user.username} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
-                </div>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => {
               signOut({ callbackUrl: `http://localhost:3000/login` })
