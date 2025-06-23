@@ -22,6 +22,7 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { toast } from "sonner"
 
 export default function DocumentCard({ document }) {
     const router = useRouter()
@@ -36,13 +37,13 @@ export default function DocumentCard({ document }) {
         try {
             const res = await deleteDocument(document.id, session.accessToken)
             if (res.status === 204) {
-                alert("Documento excluído com sucesso!")
+                toast.success("Documento excluído com sucesso!")
                 router.refresh() 
             } else {
-                console.log("Erro ao excluir o documento.")
+                toast.error("Erro ao excluir o documento.")
             }
         } catch (error) {
-            alert(error.message)
+            toast.error(error.message)
         }
     }
 
