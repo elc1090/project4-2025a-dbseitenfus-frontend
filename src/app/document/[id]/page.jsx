@@ -53,7 +53,7 @@ import { useSession } from 'next-auth/react'
 
 export default function DocumentPage() {
   const router = useRouter()
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
 
   const params = useParams()
   const documentId = params.id
@@ -76,6 +76,8 @@ export default function DocumentPage() {
   ]
 
   useEffect(() => {
+    if (status !== "authenticated") return
+
     let isCancelled = false
 
     async function init() {
@@ -89,16 +91,13 @@ export default function DocumentPage() {
       providerRef.current = provider
 
       // 👇 Recupera usuário da session
-      const savedUser = (() => {
+      const username = (() => {
         try {
-          const userStr = session.user.name
-          if (userStr) {
-            return JSON.parse(userStr)
-          }
+          return session.user.name || session.user.name || session.user.email
         } catch (e) {
           console.warn('Erro ao ler user da session:', e)
         }
-        return { username: 'Usuário' }
+        return 'Usuário'
       })()
 
 
@@ -137,7 +136,7 @@ export default function DocumentPage() {
             CollaborationCursor.configure({
               provider,
               user: {
-                name: savedUser.name || 'Usuário',
+                name: username || 'Usuário',
                 color: COLORS[Math.floor(Math.random() * COLORS.length)],
               },
 
@@ -169,7 +168,7 @@ export default function DocumentPage() {
       ydocRef.current = null
       setEditor(null)
     }
-  }, [documentId])
+  }, [documentId, status])
 
   async function handleSave() {
     if (!editorRef.current || !document || !ydocRef.current) return
