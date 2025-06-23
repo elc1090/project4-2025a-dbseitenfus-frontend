@@ -91,3 +91,4 @@ psd
 thumb
 sketch
 .env.local
+credentials/tts-key.json
