@@ -5,15 +5,16 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import DocumentCard from "@/components/document-card"
-import { getAuthenticatedUser, getDocuments, createDocument } from "@/lib/api"
+import { getDocuments, createDocument } from "@/lib/api"
+import { useSession } from "next-auth/react"
 
 export default function Home() {
 
   const router = useRouter();
+  const { data: session } =  useSession() 
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    if(!session) {
       router.push('/login'); 
     }
   }, []);
@@ -23,16 +24,14 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchUser() {
-      const user = await getAuthenticatedUser()
-      localStorage.setItem("user", JSON.stringify(user))
-      setUser(user)
+      setUser(session.user)
     }
     fetchUser()
   }, [])
 
   useEffect(() => {
     async function fetchData() {
-      const documents = await getDocuments()
+      const documents = await getDocuments(session.accessToken)
       setDocuments(documents)
     }
     fetchData()
@@ -44,7 +43,7 @@ export default function Home() {
       content: "",
       plain_text: ""
     }
-    const documentResponse = await createDocument(newDocument)
+    const documentResponse = await createDocument(newDocument, session.accessToken)
     setDocuments((prevDocuments) => [...prevDocuments, documentResponse])
   }
 
