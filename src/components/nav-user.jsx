@@ -74,7 +74,7 @@ export function NavUser({
             sideOffset={4}>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => {
-              signOut({ callbackUrl: `http://localhost:3000/login` })
+              signOut({ callbackUrl: `/login` })
             }}>
               <LogOut />
               Log out

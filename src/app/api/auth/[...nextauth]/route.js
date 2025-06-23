@@ -48,7 +48,7 @@ const handler = NextAuth({
             // Caso o login seja com Google
             if (account?.provider === "google" && profile?.email) {
                 try {
-                    const res = await fetch("http://127.0.0.1:8000/api/google-login/", {
+                    const res = await fetch("https://project4-2025a-dbseitenfus-backend.onrender.com/api/google-login/", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
